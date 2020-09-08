@@ -67,10 +67,11 @@
   }
   .change-title-button{
     height: 5vh;
+    border: none;
     padding: 5px 10px;
     outline: none;
     margin-right: 1vw;
-    background-color: #ff6600;
+    background-image: linear-gradient(to right, #ff6600, #ff8400);
     color: white;
     border-radius: 5%;
   }

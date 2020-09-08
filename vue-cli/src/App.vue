@@ -3,24 +3,12 @@
     <div class="header-div">
       DIG4104c Chat Room Project
     </div>
-    <img src="./assets/logo.png">
 <!--    custom vue component-->
     <Home></Home>
-
-    <h2>Essential Links</h2>
-    <ul>
-      <li><a href="https://vuejs.org" target="_blank">Core Docs</a></li>
-      <li><a href="https://forum.vuejs.org" target="_blank">Forum</a></li>
-      <li><a href="https://chat.vuejs.org" target="_blank">Community Chat</a></li>
-      <li><a href="https://twitter.com/vuejs" target="_blank">Twitter</a></li>
-    </ul>
-    <h2>Ecosystem</h2>
-    <ul>
-      <li><a href="http://router.vuejs.org/" target="_blank">vue-router</a></li>
-      <li><a href="http://vuex.vuejs.org/" target="_blank">vuex</a></li>
-      <li><a href="http://vue-loader.vuejs.org/" target="_blank">vue-loader</a></li>
-      <li><a href="https://github.com/vuejs/awesome-vue" target="_blank">awesome-vue</a></li>
-    </ul>
+    <h1>Chat Room Demo</h1>
+    <p class="username" >Username: {{ username }}</p>
+    <p class="online">Online: {{ users.length }}</p>
+    <ChatRoom v-if="showChatRoom" class="chat-room-container" v-bind:messages="messages" v-on:sendMessage="this.sendMessage" />
   </div>
 </template>
 
@@ -28,18 +16,59 @@
 
   //you must import a component if you want to use it, as well as define it in the 'components' object of the component you are bringing it into
   import Home from "./components/Home.vue";
+  import io from 'socket.io-client';
+  import ChatRoom from "./components/ChatRoom";
 
 export default {
   name: 'app',
   components:{
-    Home
+    Home,
+    ChatRoom,
   },
   data () {
     return {
+      username: "",
+      potentialUsername: '',
+      socket: io("http://localhost:3000"),
+      messages: [],
+      users: [],
+      showChatRoom: false,
+      showUsernameSetWarning: false,
     }
   },
-  methods:{
+  methods: {
+
+    joinServer(){
+      this.socket.on('loggedIn', data => {
+        this.messages = data.messages;
+        this.users = data.users;
+        this.socket.emit('newUser', this.username);
+      });
+      this.listen();
+    },
+    listen(){
+      this.socket.on('userOnline', user => {
+        this.users.push(user);
+      });
+      this.socket.on('userLeft', user => {
+        this.users.splice(this.users.indexOf(user), 1);
+      });
+      this.socket.on('msg', message => {
+        this.messages.push(message);
+        console.log(this.messages);
+      });
+    },
+    sendMessage(message){
+      console.log(message);
+      this.socket.emit('msg', message);
+    }
   },
+  //run these functions as soon as the components mounts to the DOM
+  mounted(){
+    this.username = prompt('please enter a username for the chat', 'Anonymous');
+    this.joinServer();
+    this.showChatRoom = true;
+  }
 }
 </script>
 
@@ -63,6 +92,11 @@ export default {
     text-shadow: 0 0 2px 2px black;
   }
 
+  .chat-room-container{
+    flex: 0.5;
+    display: flex;
+  }
+
 
 
 #app {
@@ -72,7 +106,35 @@ export default {
   text-align: center;
   color: #2c3e50;
   margin-top: 60px;
+  display: flex;
+  flex-flow: column;
+  justify-content: center;
+  align-items: center;
 }
+
+
+  input {
+    flex: 1;
+    height: 35px;
+    font-size: 18px;
+    box-sizing: border-box;
+    width: 45vh;
+  }
+
+  button {
+    width: 125px;
+    height: 35px;
+    box-sizing: border-box;
+    background-image: linear-gradient(to right, #ff6600, #ff8400);
+    color: white;
+    border: none;
+    outline: none;
+    transition: .6s ease;
+  }
+
+  button.no-username {
+    opacity: 50%;
+  }
 
 h1, h2 {
   font-weight: normal;

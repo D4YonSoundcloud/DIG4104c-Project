@@ -14,39 +14,42 @@
 </template>
 
 <script>
-  import io from 'socket.io-client';
 
+  //this is the chat room component of our application
     export default {
       name: "ChatRoom",
       data () {
         return {
+          //this is the message text that we will send to our socketIO server
           msg: ''
         }
       },
+      //these are the properties sent from our parent component
       props: ['messages'],
       methods: {
         sendMessage () {
           if (!this.msg) {
+            //return the function if there is no msg
             alert("Please enter a message");
             return;
           }
+          //$emit is the keyword used to call a function we have listening in our parent component
+          //the "v-on:sendMessage='this.sendMessage'" attribute
           this.$emit('sendMessage', this.msg);
+          //set message text back to an empty string
           this.msg = "";
+          //update the scroll after 1/10th of a second, if no timeout then it will not update
           setTimeout(() => {
             this.updateScroll();
             console.log('scroll updated');
           }, 100)
         },
         updateScroll () {
+          //helper method used to auto scroll down whenever a new message appears
           let element = document.getElementById("messages-container");
-          console.log(element, element.scrollTop, element.scrollHeight);
           element.scrollTop = element.scrollHeight;
-          console.log(element, element.scrollTop, element.scrollHeight);
         }
       },
-      created(){
-        console.log('ive been created!');
-      }
     }
 </script>
 

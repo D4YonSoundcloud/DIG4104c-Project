@@ -6,6 +6,14 @@ const app = require('express')();
  let messages = [];
  let index = 0;
 
+let getChatChartData = () => {
+    return {
+        users: users.length,
+        messages: messages.length,
+    };
+}
+
+
  io.on('connection', socket => {
    socket.emit('loggedIn', {
      //creates a new array of users with just their usernames
@@ -13,6 +21,9 @@ const app = require('express')();
      messages: messages,
    })
 
+   setInterval(() => {
+       socket.emit('getData', getChatChartData())
+   }, 1000)
 
    socket.on('newUser', username => {
      console.log(`${username} has entered`)
@@ -44,6 +55,6 @@ const app = require('express')();
    })
  });
 
- http.listen(3000, () => {
-   console.log('listening on port %s', 3000)
+ http.listen(3030, () => {
+   console.log('listening on port %s', 3030)
  })

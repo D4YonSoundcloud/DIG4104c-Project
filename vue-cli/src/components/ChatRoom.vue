@@ -1,6 +1,6 @@
 <template>
     <div class="chat-window">
-      <div class="messages">
+      <div class="messages" id="messages-container">
         <div class="message" v-for="message in messages" :key="message.index">
         <div class="username" style="margin-right: 0.25%;">{{message.username + ': '}} </div>
         <div class="message-text"> {{' ' + message.messageText}}</div>
@@ -25,13 +25,23 @@
       },
       props: ['messages'],
       methods: {
-        sendMessage: function () {
+        sendMessage () {
           if (!this.msg) {
             alert("Please enter a message");
             return;
           }
           this.$emit('sendMessage', this.msg);
           this.msg = "";
+          setTimeout(() => {
+            this.updateScroll();
+            console.log('scroll updated');
+          }, 100)
+        },
+        updateScroll () {
+          let element = document.getElementById("messages-container");
+          console.log(element, element.scrollTop, element.scrollHeight);
+          element.scrollTop = element.scrollHeight;
+          console.log(element, element.scrollTop, element.scrollHeight);
         }
       },
       created(){
@@ -47,12 +57,16 @@
     flex-direction: column;
     background-color: rgb(230, 230, 230);
     box-shadow: 1px 1px 6px 0 rgba(0, 0, 0, 0.15);
-    width: 50vw;
+    transform: translateX(-25%);
+    /*overflow-y: scroll;*/
+    width: 40vw;
+    max-height: 400px;
   }
 
-  .chat-window.messages {
+  .messages {
+    max-height: 365px;
     flex: 1;
-    overflow: scroll;
+    overflow-y: scroll;
   }
   .message {
     flex-flow: row;

@@ -9,6 +9,7 @@
     <p class="username" >Username: {{ username }}</p>
     <p class="online">Online: {{ users.length }}</p>
     <ChatRoom v-if="showChatRoom" class="chat-room-container" v-bind:messages="messages" v-on:sendMessage="this.sendMessage" />
+    <Chart  class="chart-div"></Chart>
   </div>
 </template>
 
@@ -18,18 +19,20 @@
   import Home from "./components/Home.vue";
   import io from 'socket.io-client';
   import ChatRoom from "./components/ChatRoom";
+  import Chart from "./components/Chart";
 
 export default {
   name: 'app',
   components:{
     Home,
     ChatRoom,
+    Chart,
   },
   data () {
     return {
       username: "",
       potentialUsername: '',
-      socket: io("http://localhost:3000"),
+      socket: io("http://localhost:3030"),
       messages: [],
       users: [],
       showChatRoom: false,
@@ -97,6 +100,11 @@ export default {
     display: flex;
   }
 
+  .chart-div{
+    position: absolute;
+    right: 18%;
+    bottom: 20%;
+  }
 
 
 #app {
